@@ -45,12 +45,13 @@ from utils import(
 LEARNING_RATE = 1e-5
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 32
-NUM_EPOCHS = 50
+NUM_EPOCHS = 5
 IMAGE_HEIGHT = 220
 IMAGE_WIDTH = 220
 NUM_WORKERS = 1
 ROOT_DIR = 'data/flowers'
 LOAD_MODEL = False
+writer = SummaryWriter()
 
 
 def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimizer, device):
@@ -75,6 +76,8 @@ def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimiz
         
         print(acc, len(train_loader))
         acc = (acc / len(train_loader)) * 100
+
+        writer.add_scalar("Loss/train", losses[i], i)
 
         print(f'train loss: {np.mean(losses)} and train acc: {acc}')
 
@@ -131,5 +134,6 @@ def main():
 
     train(model, NUM_EPOCHS, train_loader, valid_loader, loss_fn, acc_metric, optimizer, DEVICE)
 
+    writer.flush()
 if __name__ == "__main__":
     main()

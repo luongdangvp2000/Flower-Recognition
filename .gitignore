@@ -1,2 +1,4 @@
 *.jpg
 *.zip
+__pycache__/
+.idea/
