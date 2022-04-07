@@ -51,10 +51,10 @@ IMAGE_WIDTH = 220
 NUM_WORKERS = 1
 ROOT_DIR = 'data/flowers'
 LOAD_MODEL = False
-writer = SummaryWriter()
+writer = SummaryWriter(f'runs/Flower-Recognition/tryingout_tensorboard')
+# step = 0
 
-
-def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimizer, device):
+def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimizer, device, step=0):
     for i in range(epoch):
         print(f'epoch {i+1}/{epoch}')
         model = model.to(device)
@@ -73,11 +73,15 @@ def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimiz
 
             losses.append(loss.item())
             acc += acc_metric(train_output, train_label)
-        
+
+            writer.add_scalar("Training Loss", loss, global_step=step)
+            #writer.add_scalar("Training Accuracy", loss)
+            step += 1
+
         print(acc, len(train_loader))
         acc = (acc / len(train_loader)) * 100
 
-        writer.add_scalar("Loss/train", losses[i], i)
+        
 
         print(f'train loss: {np.mean(losses)} and train acc: {acc}')
 
