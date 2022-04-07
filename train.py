@@ -34,6 +34,8 @@ from dataset import (
 )
 
 from utils import(
+    save_checkpoint,
+    load_checkpoint,
     denormalize,
     show_image,
     get_train_test_dataset,
@@ -48,6 +50,7 @@ IMAGE_HEIGHT = 220
 IMAGE_WIDTH = 220
 NUM_WORKERS = 1
 ROOT_DIR = 'data/flowers'
+LOAD_MODEL = False
 
 
 def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimizer, device):
@@ -88,6 +91,15 @@ def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimiz
 
         eval_acc = eval_acc / len(valid_loader) * 100
         print(f'valid loss: {np.mean(eval_losses)} and valid acc: {eval_acc}')
+        
+        # save model
+        checkpoint = {
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+        }
+
+        print("=> Saving checkpoint")
+        save_checkpoint(checkpoint)
         print('*******')
 
 def main():
@@ -107,7 +119,10 @@ def main():
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=True)
     valid_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, pin_memory=True)
     test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, pin_memory=True)
-    
+
+    if LOAD_MODEL:
+        load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
+
     #model
     model = ResNet9(in_channels=3, n_classes=5)
 

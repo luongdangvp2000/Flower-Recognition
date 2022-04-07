@@ -25,7 +25,13 @@ from albumentations.pytorch import ToTensorV2
 from PIL import Image
 
 
+def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
+    print("=> Saving checkpoint")
+    torch.save(state, filename)
 
+def load_checkpoint(checkpoint, model):
+    print("=> Loading checkpoint")
+    model.load_state_dict(checkpoint["state_dict"])
 
 def denormalize(images, means, stds):
     if len(images.shape) == 3:
@@ -57,3 +63,25 @@ def acc_metric(pred, label):
     
     acc = np.array((label == pred)).sum()/len(label)
     return acc
+
+def to_device(data, device):
+    """Move tensor(s) to chosen device"""
+    if isinstance(data, (list,tuple)):
+        return [to_device(x, device) for x in data]
+    return data.to(device, non_blocking=True)
+
+def predict_image(img, model):
+    # Convert to a batch of 1
+    xb = to_device(img.unsqueeze(0), device)
+    # Get predictions from model
+    yb = model(xb)
+    # Pick index with highest probability
+    _, preds  = torch.max(yb, dim=1)
+    # Retrieve the class label
+    return dataset.classes[preds[0].item()]
+
+def test_predict_image(img, model, device="cuda"):
+    xb = img.unsqueeze(0).to(device)
+    yb = model(xb)
+    _, preds  = torch.max(yb, dim=1)
+    return dataset.classes[preds[0].item()]
