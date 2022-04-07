@@ -14,7 +14,7 @@ fi
 
 pip install kaggle --upgrade
 
-kaggle datasets download -d alxmamaev/flowers-recognition -f archive.zip
-unzip archive.zip
-mv flowers_recognition data/
-rm archive.zip
+kaggle datasets download -d alxmamaev/flowers-recognition -p data/
+unzip data/flowers-recognition.zip -d data/
+# mv flowers-recognition data/
+# rm flowers-recognition.zip
