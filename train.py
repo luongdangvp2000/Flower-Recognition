@@ -45,7 +45,7 @@ from utils import(
 LEARNING_RATE = 1e-5
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 32
-NUM_EPOCHS = 5
+NUM_EPOCHS = 3
 IMAGE_HEIGHT = 220
 IMAGE_WIDTH = 220
 NUM_WORKERS = 1
@@ -74,16 +74,20 @@ def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimiz
             losses.append(loss.item())
             acc += acc_metric(train_output, train_label)
 
+            #Add traning loss and accuracy to tensorboard
             writer.add_scalar("Training Loss", loss, global_step=step)
-            #writer.add_scalar("Training Accuracy", loss)
+            writer.add_scalar("Training Accuracy", acc, global_step=step)
             step += 1
 
         print(acc, len(train_loader))
         acc = (acc / len(train_loader)) * 100
-
-        
-
         print(f'train loss: {np.mean(losses)} and train acc: {acc}')
+
+        # Doing hyperparamenters search on tensorboard
+        writer.add_hparams(
+            {'Learning rate': LEARNING_RATE, 'Batch size': BATCH_SIZE},
+            {'Accuracy': acc, 'Loss': np.mean(losses)}
+        )
 
         model.eval()
         eval_losses = []
@@ -105,7 +109,7 @@ def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimiz
             "optimizer": optimizer.state_dict(),
         }
 
-        print("=> Saving checkpoint")
+        #print("=> Saving checkpoint")
         save_checkpoint(checkpoint)
         print('*******')
 
@@ -138,6 +142,6 @@ def main():
 
     train(model, NUM_EPOCHS, train_loader, valid_loader, loss_fn, acc_metric, optimizer, DEVICE)
 
-    writer.flush()
+    #writer.flush()
 if __name__ == "__main__":
     main()
