@@ -74,6 +74,9 @@ def train(model, epoch, train_loader, valid_loader, loss_fn, acc_metric, optimiz
             losses.append(loss.item())
             acc += acc_metric(train_output, train_label)
 
+            img_grid = torchvision.utils.make_grid(train_input)
+            writer.add_image('Flowers Recognition Images', img_grid)
+
             #Add traning loss and accuracy to tensorboard
             writer.add_scalar("Training Loss", loss, global_step=step)
             writer.add_scalar("Training Accuracy", acc, global_step=step)
