@@ -10,6 +10,4 @@ from utils import (
 )
 
 if __name__ == "__main__":
-    img, label = valid_ds[6]
-    plt.imshow(img.permute(1, 2, 0).clamp(0, 1))
-    print('Label:', dataset.classes[label], ', Predicted:', predict_image(img, model))
+    print("Hello")
